@@ -1,0 +1,70 @@
+# Spec-Kit Template - Language Agnostic .gitignore
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS files
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+/tmp/
+.tmp/
+
+# Log files
+*.log
+logs/
+*.log.*
+
+# Environment files (may contain secrets)
+.env
+.env.local
+.env.*.local
+
+# Common build output directories (add more as needed for your stack)
+/build/
+/dist/
+/out/
+/target/
+/bin/
+/.next/
+/.nuxt/
+
+# Dependency directories (add more as needed for your stack)
+/node_modules/
+/vendor/
+/.venv/
+/venv/
+/__pycache__/
+*.pyc
+
+# Package manager lock files (uncomment if you want to ignore them)
+# package-lock.json
+# yarn.lock
+# Gemfile.lock
+# poetry.lock
+# Pipfile.lock
+# composer.lock
+
+# Coverage reports
+/coverage/
+*.coverage
+.nyc_output/
+htmlcov/
+
+# Test output
+/test-results/
+/.pytest_cache/
+
+# Debug files
+*.pdb
+*.dSYM/
+
+# Note: Add technology-specific ignores when you adopt a stack
