@@ -1,0 +1,16 @@
+name: Pages Branch Workflow
+on:
+  push:
+    branches:
+      - pages
+  pull_request:
+    branches:
+      - pages
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Pages job
+        run: echo "Running pages branch tasks"
