@@ -1,0 +1,128 @@
+name: Initial Provision
+on:
+  workflow_dispatch:
+    inputs:
+      is_initial_provision:
+        description: "Set to true to run the initial provisioning workflow"
+        required: false
+        default: "true"
+jobs:
+  initial-provision:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      administration: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Determine if initial provisioning is needed
+        id: check
+        run: |
+          count=$(git rev-list --count HEAD)
+          if [ "$count" -gt 1 ]; then
+            echo "is_initial_provision=false" >> $GITHUB_OUTPUT
+          else
+            echo "is_initial_provision=true" >> $GITHUB_OUTPUT
+          fi
+      - name: Relax branch protection
+        if: steps.check.outputs.is_initial_provision == 'true' && github.event.inputs.is_initial_provision == 'true'
+        id: relax
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const branch = context.payload.repository.default_branch;
+            // store existing protection
+            const protection = await github.rest.repos.getBranchProtection({ owner, repo, branch });
+            core.setOutput('protection', JSON.stringify(protection.data));
+            await github.rest.repos.deleteBranchProtection({ owner, repo, branch });
+      - name: Merge bootstrap pull requests
+        if: steps.check.outputs.is_initial_provision == 'true' && github.event.inputs.is_initial_provision == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prs = await github.paginate(github.rest.pulls.list, { owner, repo, state: 'open' });
+            for (const pr of prs) {
+              if (pr.draft) {
+                await github.rest.pulls.update({
+                  owner,
+                  repo,
+                  pull_number: pr.number,
+                  draft: false
+                });
+              }
+              await github.rest.pulls.merge({
+                owner,
+                repo,
+                pull_number: pr.number,
+                merge_method: 'squash'
+              });
+            }
+      - name: Reinstate branch protection
+        if: steps.check.outputs.is_initial_provision == 'true' && github.event.inputs.is_initial_provision == 'true'
+        uses: actions/github-script@v7
+        env:
+          PROTECTION: ${{ steps.relax.outputs.protection }}
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const branch = context.payload.repository.default_branch;
+            const saved = JSON.parse(process.env.PROTECTION);
+            await github.rest.repos.updateBranchProtection({
+              owner,
+              repo,
+              branch,
+              required_status_checks: saved.required_status_checks,
+              enforce_admins: saved.enforce_admins.enabled,
+              required_pull_request_reviews: saved.required_pull_request_reviews,
+              restrictions: saved.restrictions
+            });
+      - name: Install TFC dependencies
+        if: steps.check.outputs.is_initial_provision == 'true' && github.event.inputs.is_initial_provision == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq curl
+      - name: Derive TFC workspace name
+        if: steps.check.outputs.is_initial_provision == 'true' && github.event.inputs.is_initial_provision == 'true'
+        id: tfc_workspace
+        run: |
+          REPO_NAME="${GITHUB_REPOSITORY##*/}"
+          # Use repository name as workspace name
+          # Supports both A-XX pattern and regular names
+          WORKSPACE_NAME="$REPO_NAME"
+          echo "workspace_name=$WORKSPACE_NAME" >> $GITHUB_OUTPUT
+          echo "Repository: $GITHUB_REPOSITORY"
+          echo "Workspace: $WORKSPACE_NAME"
+      - name: Run TFC workspace sync
+        if: steps.check.outputs.is_initial_provision == 'true' && github.event.inputs.is_initial_provision == 'true'
+        env:
+          TFC_TOKEN: ${{ secrets.TFC_TOKEN }}
+          TFC_ORG: pr-cybr
+          TFC_API_URL: https://app.terraform.io/api/v2
+          WORKSPACE_NAME: ${{ steps.tfc_workspace.outputs.workspace_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          if [ -z "$TFC_TOKEN" ]; then
+            echo "::warning::TFC_TOKEN secret is not set. TFC bootstrap will be skipped."
+            echo "To enable TFC integration, add TFC_TOKEN to repository secrets."
+          else
+            bash scripts/tfc_sync.sh
+          fi
+      - name: Tag bootstrap completion
+        if: steps.check.outputs.is_initial_provision == 'true' && github.event.inputs.is_initial_provision == 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          if git rev-parse --verify bootstrap-complete >/dev/null 2>&1; then
+            echo "bootstrap-complete tag already exists"
+          else
+            git tag bootstrap-complete
+            git push origin bootstrap-complete
+          fi

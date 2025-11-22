@@ -1,0 +1,19 @@
+name: Plan Branch Workflow
+
+on:
+  push:
+    branches: [plan]
+  pull_request:
+    branches: [plan]
+
+permissions:
+  contents: read
+
+jobs:
+  plan_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run Plan Tasks
+        run: echo "Running tasks for plan branch"

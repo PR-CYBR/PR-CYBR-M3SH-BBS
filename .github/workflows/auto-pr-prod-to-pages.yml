@@ -1,0 +1,41 @@
+name: Auto PR from prod to pages
+on:
+  workflow_run:
+    workflows: ["Production Branch Workflow"]
+    branches:
+      - prod
+    types:
+      - completed
+permissions:
+  pull-requests: write
+  contents: read
+jobs:
+  create-pull-request:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create pull request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const head = 'prod';
+            const base = 'pages';
+            const { data: pulls } = await github.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${head}`,
+              base: base,
+              state: 'open'
+            });
+            if (pulls.length === 0) {
+              await github.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                head: head,
+                base: base,
+                title: 'Sync pages with prod',
+                body: 'Automated PR to sync pages branch with prod.'
+              });
+            } else {
+              console.log('Pull request already exists');
+            }

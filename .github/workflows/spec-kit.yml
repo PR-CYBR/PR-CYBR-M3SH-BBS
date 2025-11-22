@@ -1,0 +1,47 @@
+name: Spec-Kit Validation
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Check required files exist
+        run: |
+          required_files=(.specify/constitution.md .specify/spec.md .specify/plan.md)
+          for file in "${required_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "Required file missing: $file" >&2
+              exit 1
+            fi
+          done
+      - name: Check for broken links in Markdown files
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          config-file: .github/workflows/markdown-link-check-config.json
+        continue-on-error: true
+      - name: List tasks
+        run: |
+          echo "Tasks:"
+          find .specify/tasks -type f -print
+      - name: Check Terraform configuration exists
+        run: |
+          if [ -d "infra" ]; then
+            echo "✓ Terraform infrastructure directory found"
+            required_tf_files=(infra/main.tf infra/variables.tf infra/variables.tfvars infra/providers.tf infra/outputs.tf)
+            for file in "${required_tf_files[@]}"; do
+              if [ ! -f "$file" ]; then
+                echo "⚠ Terraform file missing: $file" >&2
+              else
+                echo "✓ Found: $file"
+              fi
+            done
+          else
+            echo "⚠ Terraform infrastructure directory not found" >&2
+          fi
+      - name: Summary
+        run: echo "Spec-Kit validation complete."

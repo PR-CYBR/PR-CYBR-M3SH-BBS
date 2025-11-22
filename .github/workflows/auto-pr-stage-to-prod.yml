@@ -1,0 +1,41 @@
+name: Auto PR from stage to prod
+on:
+  workflow_run:
+    workflows: ["Stage Branch Workflow"]
+    branches:
+      - stage
+    types:
+      - completed
+permissions:
+  pull-requests: write
+  contents: read
+jobs:
+  create-pull-request:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create pull request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const head = 'stage';
+            const base = 'prod';
+            const { data: pulls } = await github.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${head}`,
+              base: base,
+              state: 'open'
+            });
+            if (pulls.length === 0) {
+              await github.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                head: head,
+                base: base,
+                title: 'Sync prod with stage',
+                body: 'Automated PR to sync prod branch with stage.'
+              });
+            } else {
+              console.log('Pull request already exists');
+            }

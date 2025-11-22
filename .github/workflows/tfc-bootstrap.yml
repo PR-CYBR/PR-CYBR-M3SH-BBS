@@ -1,0 +1,94 @@
+name: TFC Bootstrap
+
+on:
+  workflow_dispatch:
+    inputs:
+      is_initial_provision:
+        description: "Set to true to run TFC workspace provisioning"
+        required: false
+        default: "true"
+  workflow_call:
+    inputs:
+      is_initial_provision:
+        description: "Set to true to run TFC workspace provisioning"
+        required: false
+        default: "true"
+        type: string
+
+env:
+  TFC_ORG: pr-cybr
+  TFC_API_URL: https://app.terraform.io/api/v2
+
+jobs:
+  tfc-bootstrap:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.is_initial_provision == 'true' || inputs.is_initial_provision == 'true'
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq curl
+
+      - name: Derive workspace name
+        id: workspace
+        run: |
+          REPO_NAME="${GITHUB_REPOSITORY##*/}"
+          # Use repository name as workspace name
+          # Supports both A-XX pattern and regular names
+          WORKSPACE_NAME="$REPO_NAME"
+          echo "workspace_name=$WORKSPACE_NAME" >> $GITHUB_OUTPUT
+          echo "Repository: $GITHUB_REPOSITORY"
+          echo "Workspace: $WORKSPACE_NAME"
+
+      - name: Check TFC Token
+        run: |
+          if [ -z "${{ secrets.TFC_TOKEN }}" ]; then
+            echo "::warning::TFC_TOKEN secret is not set. TFC bootstrap will be skipped."
+            echo "To enable TFC integration, add TFC_TOKEN to repository secrets."
+            exit 0
+          fi
+
+      - name: Run TFC Sync
+        if: secrets.TFC_TOKEN != ''
+        env:
+          TFC_TOKEN: ${{ secrets.TFC_TOKEN }}
+          TFC_ORG: ${{ env.TFC_ORG }}
+          TFC_API_URL: ${{ env.TFC_API_URL }}
+          WORKSPACE_NAME: ${{ steps.workspace.outputs.workspace_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          bash scripts/tfc_sync.sh
+
+      - name: Generate workflow summary
+        if: always()
+        run: |
+          echo "## TFC Bootstrap Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Organization:** ${{ env.TFC_ORG }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Workspace:** ${{ steps.workspace.outputs.workspace_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Repository:** ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Timestamp:** $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -n "${{ secrets.TFC_TOKEN }}" ]; then
+            echo "✅ TFC workspace provisioning completed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ TFC_TOKEN not configured - bootstrap skipped" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "To enable TFC integration:" >> $GITHUB_STEP_SUMMARY
+            echo "1. Generate a Terraform Cloud API token" >> $GITHUB_STEP_SUMMARY
+            echo "2. Add it as \`TFC_TOKEN\` in repository secrets" >> $GITHUB_STEP_SUMMARY
+            echo "3. Re-run this workflow" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload infra directory
+        if: secrets.TFC_TOKEN != '' && hashFiles('infra/**') != ''
+        uses: actions/upload-artifact@v3
+        with:
+          name: infra-config
+          path: infra/
+          retention-days: 7

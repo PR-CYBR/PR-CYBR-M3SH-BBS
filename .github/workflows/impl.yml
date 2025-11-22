@@ -1,0 +1,19 @@
+name: Implementation Branch Workflow
+
+on:
+  push:
+    branches: [impl]
+  pull_request:
+    branches: [impl]
+
+permissions:
+  contents: read
+
+jobs:
+  impl_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run Implementation Tasks
+        run: echo "Running tasks for impl branch"

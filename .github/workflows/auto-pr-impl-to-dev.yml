@@ -1,0 +1,41 @@
+name: Auto PR from impl to dev
+on:
+  workflow_run:
+    workflows: ["Implementation Branch Workflow"]
+    branches:
+      - impl
+    types:
+      - completed
+permissions:
+  pull-requests: write
+  contents: read
+jobs:
+  create-pull-request:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Pull Request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const head = 'impl';
+            const base = 'dev';
+            const { data: pulls } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${head}`,
+              base: base,
+              state: 'open'
+            });
+            if (pulls.length === 0) {
+              await github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                head: head,
+                base: base,
+                title: 'Sync dev with impl',
+                body: 'Automated PR to sync dev branch with impl.'
+              });
+            } else {
+              console.log('Pull request already exists');
+            }

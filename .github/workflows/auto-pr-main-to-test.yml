@@ -1,0 +1,41 @@
+name: Auto PR from main to test
+on:
+  workflow_run:
+    workflows: ["Spec-Kit Validation"]
+    branches:
+      - main
+    types:
+      - completed
+permissions:
+  pull-requests: write
+  contents: read
+jobs:
+  create-pull-request:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create pull request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const head = 'main';
+            const base = 'test';
+            const { data: pulls } = await github.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${head}`,
+              base: base,
+              state: 'open'
+            });
+            if (pulls.length === 0) {
+              await github.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                head: head,
+                base: base,
+                title: 'Sync test with main',
+                body: 'Automated PR to sync test branch with main.'
+              });
+            } else {
+              console.log('Pull request already exists');
+            }

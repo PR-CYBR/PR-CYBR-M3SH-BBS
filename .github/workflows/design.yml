@@ -1,0 +1,19 @@
+name: Design Branch Workflow
+
+on:
+  push:
+    branches: [design]
+  pull_request:
+    branches: [design]
+
+permissions:
+  contents: read
+
+jobs:
+  design_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run Design Tasks
+        run: echo "Running tasks for design branch"

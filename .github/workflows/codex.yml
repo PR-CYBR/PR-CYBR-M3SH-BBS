@@ -1,0 +1,19 @@
+name: Codex Branch Workflow
+
+on:
+  push:
+    branches: [codex]
+  pull_request:
+    branches: [codex]
+
+permissions:
+  contents: read
+
+jobs:
+  codex_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run Codex Tasks
+        run: echo "Running tasks for codex branch"

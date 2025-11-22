@@ -1,0 +1,41 @@
+name: Auto PR from codex to pages
+on:
+  workflow_run:
+    workflows: ["Codex Branch Workflow"]
+    branches:
+      - codex
+    types:
+      - completed
+permissions:
+  pull-requests: write
+  contents: read
+jobs:
+  create-pull-request:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Pull Request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const head = 'codex';
+            const base = 'pages';
+            const { data: pulls } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${head}`,
+              base: base,
+              state: 'open'
+            });
+            if (pulls.length === 0) {
+              await github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                head: head,
+                base: base,
+                title: 'Sync pages with codex',
+                body: 'Automated PR to sync pages branch with codex knowledge base.'
+              });
+            } else {
+              console.log('Pull request already exists');
+            }

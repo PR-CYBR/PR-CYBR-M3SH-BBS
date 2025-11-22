@@ -1,0 +1,46 @@
+name: Terraform Validation
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'infra/**'
+      - '.github/workflows/tfc-verify.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'infra/**'
+      - '.github/workflows/tfc-verify.yml'
+jobs:
+  terraform-validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~> 1.5"
+      
+      - name: Terraform Format Check
+        working-directory: ./infra
+        run: terraform fmt -check -recursive
+        continue-on-error: false
+      
+      - name: Terraform Init
+        working-directory: ./infra
+        run: terraform init -backend=false
+      
+      - name: Terraform Validate
+        working-directory: ./infra
+        run: terraform validate
+      
+      - name: Terraform Plan
+        working-directory: ./infra
+        run: terraform plan -input=false -no-color -var-file=variables.tfvars
+        continue-on-error: false
+      
+      - name: Summary
+        run: echo "Terraform validation complete."

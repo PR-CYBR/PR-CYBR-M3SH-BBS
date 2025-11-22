@@ -1,0 +1,19 @@
+name: GitHub Pages Branch Workflow
+
+on:
+  push:
+    branches: [gh-pages]
+  pull_request:
+    branches: [gh-pages]
+
+permissions:
+  contents: read
+
+jobs:
+  gh_pages_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run GitHub Pages Tasks
+        run: echo "Running tasks for gh-pages branch"
