@@ -1,3 +1,22 @@
+# =========================================================================
+# Deploy PR-CYBR-M3SH-BBS Dashboard to GitHub Pages
+# =========================================================================
+#
+# This workflow deploys the /dashboard directory to GitHub Pages.
+#
+# IMPORTANT: GitHub Pages must be configured to use GitHub Actions!
+#
+# To enable this workflow:
+# 1. Go to your repository Settings
+# 2. Navigate to Pages (Settings → Pages)
+# 3. Under "Build and deployment", set Source to "GitHub Actions"
+# 4. Save the changes
+#
+# The dashboard will then be available at:
+# https://pr-cybr.github.io/PR-CYBR-M3SH-BBS/
+#
+# =========================================================================
+
 name: Deploy dashboard to GitHub Pages
 
 on:
@@ -9,6 +28,7 @@ on:
       - 'assets/**'
       - 'config/**'
       - 'scripts/**'
+      - '.github/workflows/dashboard-pages.yml'
   workflow_dispatch:
 
 permissions:
