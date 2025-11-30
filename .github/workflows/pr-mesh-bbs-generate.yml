@@ -1,0 +1,48 @@
+name: PR-MESH-BBS Generate
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 09:00 AST (UTC-4) = 13:00 UTC
+    - cron: '0 13 * * *'
+    # 18:00 AST (UTC-4) = 22:00 UTC
+    - cron: '0 22 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    name: Generate PR-MESH-BBS Bulletins
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml
+      
+      - name: Generate bulletins
+        run: |
+          python scripts/pr_mesh_bbs_generate.py --verbose
+      
+      - name: Validate output
+        run: |
+          python scripts/validate_bbs_output.py --pr-mesh-bbs --verbose
+      
+      - name: Upload bulletins artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-mesh-bbs-bulletins
+          path: out/pr-mesh-bbs/
+          retention-days: 7
+          if-no-files-found: error

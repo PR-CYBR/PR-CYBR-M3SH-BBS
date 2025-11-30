@@ -37,9 +37,28 @@ Automation workflows for linting, validation, and task management.
   
 Changes to the constitution require explicit review and approval. The constitution serves as the foundational agreement for how the project operates.  
   
-## Adaptability  
+## Adaptability
 
-This template is language‑agnostic; teams should make minimal changes when adapting the template to their specific tools.  
+This template is language‑agnostic; teams should make minimal changes when adapting the template to their specific tools.
+
+## PR‑CYBR Meshtastic BBS Rules
+
+The following non‑negotiable rules apply to the PR‑CYBR Meshtastic BBS system:
+
+1. **No Hard‑Coded Secrets**  
+   Pre‑shared keys (PSKs), passphrases, API tokens, and other sensitive credentials must never be committed to the repository. Use environment variables or GitHub Secrets for configuration.
+
+2. **JSON as Canonical Interchange Format**  
+   All BBS payloads transmitted over Meshtastic (and later Reticulum) must use well‑defined JSON schemas. This ensures interoperability, validation, and bridging capability.
+
+3. **Encrypt MAILB0X Contents at Rest**  
+   All messages stored in the MAILB0X (Channel‑6) must be encrypted using AES‑256‑GCM with a key derived from a user‑provided passphrase (via Argon2id or PBKDF2). Passphrases must never be stored persistently.
+
+4. **Spec‑First Workflow**  
+   All changes to the BBS architecture must follow the Spec‑Kit workflow: update specifications and plans first, create tasks, then implement. Code without corresponding specification updates will be rejected.
+
+5. **Configuration over Hard‑Coding**  
+   Hardware specifics (serial ports, baud rates), channel mappings, and schedules must be externalized in configuration files (`config/`) or environment variables, not hard‑coded in scripts.
 
 ## Branching Strategy  
 

@@ -1,0 +1,28 @@
+# PR-CYBR Meshtastic BBS Dependencies
+# Python 3.11+
+
+# Cryptography for MAILB0X encryption
+cryptography>=41.0.0
+
+# Argon2 key derivation function
+argon2-cffi>=23.1.0
+
+# QR code generation for channel join URLs
+qrcode[pil]>=7.4.0
+
+# YAML configuration parsing
+pyyaml>=6.0.0
+
+# Meshtastic Python API (for transmission scripts)
+meshtastic>=2.3.0
+
+# Testing framework
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Type checking (optional, for development)
+# mypy>=1.6.0
+
+# Code formatting (optional, for development)
+# black>=23.10.0
+# isort>=5.12.0

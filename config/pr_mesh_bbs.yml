@@ -1,0 +1,36 @@
+# PR-MESH-BBS Configuration
+# Public Bulletin Board System on Channel-0 (LongFast)
+
+bbs:
+  name: "PR-MESH-BBS"
+  description: "Puerto Rico Public Mesh Bulletin Board System"
+  channel: 0
+  modem_preset: "LongFast"
+
+# Broadcast schedule (local time - AST/Atlantic Standard Time, UTC-4)
+schedule:
+  - "09:00"
+  - "18:00"
+
+# Content sources
+sources:
+  announcements:
+    path: "data/pr-mesh-bbs/announcements"
+    category: "ANNOUNCEMENT"
+    default_priority: "normal"
+  sitreps:
+    path: "data/pr-mesh-bbs/sitreps"
+    category: "SITREP"
+    default_priority: "high"
+
+# Output settings
+output:
+  directory: "out/pr-mesh-bbs"
+  filename: "bulletins.json"
+
+# Bulletin defaults
+defaults:
+  # Default validity period in hours
+  valid_hours: 24
+  # Default priority
+  priority: "normal"

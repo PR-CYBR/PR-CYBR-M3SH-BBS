@@ -1,0 +1,31 @@
+# Hardware Configuration for Meshtastic BBS
+# This file contains device-specific settings for the Raspberry Pi deployment
+
+# Serial connection settings
+# Override with environment variables: MESH_SERIAL_PORT, MESH_BAUD
+serial:
+  # Serial port path (auto-detect if null)
+  # Examples: /dev/ttyUSB0, /dev/ttyACM0, COM3
+  port: null
+  # Baud rate for serial communication
+  baud: 115200
+  # Connection timeout in seconds
+  timeout: 10
+
+# Device information
+device:
+  # Expected device type (for validation)
+  type: "MorosX XTAK-LoRa-Mesh"
+  # Region configuration (affects frequency plan)
+  region: "US"
+
+# Runtime settings
+runtime:
+  # Hop limit for transmitted messages (1-7)
+  default_hop_limit: 3
+  # Maximum message size in bytes
+  max_message_size: 228
+  # Retry count for failed transmissions
+  retry_count: 3
+  # Delay between retries in seconds
+  retry_delay: 5

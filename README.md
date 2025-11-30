@@ -1,124 +1,273 @@
-[![Spec-Kit Validation](https://github.com/PR-CYBR/spec-bootstrap/actions/workflows/spec-kit.yml/badge.svg?branch=main)](https://github.com/PR-CYBR/spec-bootstrap/actions/workflows/spec-kit.yml)  
-**Branch Purpose:** The `main` branch is the stable baseline representing production-ready code. All changes integrated through the CI/CD pipeline eventually land here.
-# Spec-Bootstrap  
-[![Spec-Kit Validation](https://github.com/PR-CYBR/spec-bootstrap/actions/workflows/spec-kit.yml/badge.svg)](https://github.com/PR-CYBR/spec-bootstrap/actions/workflows/spec-kit.yml)  
+[![Spec-Kit Validation](https://github.com/PR-CYBR/PR-CYBR-M3SH-BBS/actions/workflows/spec-kit.yml/badge.svg?branch=main)](https://github.com/PR-CYBR/PR-CYBR-M3SH-BBS/actions/workflows/spec-kit.yml)
+[![CI](https://github.com/PR-CYBR/PR-CYBR-M3SH-BBS/actions/workflows/ci.yml/badge.svg)](https://github.com/PR-CYBR/PR-CYBR-M3SH-BBS/actions/workflows/ci.yml)
 
-Spec-Bootstrap is a language agnostic template repository built on the Spec Kit specification-driven development framework. It provides a ready to use structure to capture your project’s constitution, specifications, implementation plans and tasks. This template ensures that your development process remains transparent, well‑documented, and consistent across projects.  
+# PR-CYBR Meshtastic BBS
 
-## Usage  
-### Use as a Template  
-Click **Use this template** on the repository’s main page to scaffold a new project. GitHub will clone the files from this template (including the `.specify` directory and GitHub Actions workflows) into your new repository, so you can start specifying and planning your project immediately.  
+A multi-channel Bulletin Board System (BBS) architecture for Meshtastic mesh networks, designed for Puerto Rico's emergency communication infrastructure.
 
-### Integrate into an Existing Project  
-To adopt Spec Kit in an existing repository, merge this repository into your project (via `git pull` or by copying files). Make sure to copy the `.specify` directory and `.github/workflows` folder into your project root. Adapt the `constitution.md`, `spec.md`, and `plan.md` files to match your project’s goals and update the tasks accordingly.  
+## Overview
 
-## Run Status Indicator  
-The badge above reflects the current status of the Spec Kit validation workflow on the `main` branch. It runs checks on required files, markdown syntax and link validation, and summarises tasks. A passing badge means the template structure is intact.  
+This repository implements two complementary BBS systems:
 
-## Branching Strategy  
-This repository implements a comprehensive branching scheme to support specification-driven development. See [BRANCHING.md](BRANCHING.md) for detailed documentation on:  
-- Purpose and usage of each branch (spec, plan, design, impl, dev, main, test, stage, prod, pages, gh-pages, codex)  
-- Automated pull request workflows between branches  
-- Branch protection rules and best practices  
-- Development lifecycle flow from specifications through production  
+- **PR-MESH-BBS** - Public bulletin board on Meshtastic Channel-0 (LongFast default)
+- **PR-CYBR-BBS** - Private operational BBS on Meshtastic Channels 1-6
 
-## AI Driven Development  
-This repository is designed to be used not only by humans but also by AI coding agents. When using an AI agent to scaffold or extend your project:  
-- **Start with the spec** – Agents should read and, if necessary, refine the documents in `.specify/constitution.md`, `.specify/spec.md` and `.specify/plan.md` before writing any code.  
-- **Follow the phases** – Agents must honor the Spec Kit workflow: specify, plan, create tasks and then implement. This prevents "vibe coding" and ensures work is grounded in agreed requirements.  
-- **Update as you go** – If the AI agent makes design decisions or adds features, it should update the spec and plan documents to keep them living and reflective of the code.  
-- **Respect the Constitution** – The project’s constitution defines non‑negotiable rules (coding standards, testing expectations, security requirements). AI agents should adhere to these guidelines when generating code or documentation.  
+Both systems share the same codebase and are designed to run on a Raspberry Pi 5 connected to a MorosX XTAK-LoRa-Mesh unit.
 
-## License  
-This project will be released under the [MIT License](LICENSE).  
+## Channel Mapping
 
-## Quick Start  
-1. **Clone or Fork this repository**  
-  ```bash  
-  git clone https://github.com/PR-CYBR/spec-bootstrap.git  
-  cd spec-bootstrap  
-  ```  
+| Channel | Name        | Purpose                                          |
+|---------|-------------|--------------------------------------------------|
+| 0       | PR-MESH-BBS | Public island-wide bulletin board (LongFast)     |
+| 1       | OPS-SITREP  | Island/division situational reports              |
+| 2       | S2-INTEL    | Threats, incidents, BOLOs, Amber Alerts          |
+| 3       | S3-PLANS    | Planned operations, deployments, FTXs            |
+| 4       | M3SH-OPS    | PR-CYBR-MAP updates, node status, sensor status  |
+| 5       | LOG-RES     | Logistics and resources                          |
+| 6       | MAILB0X     | Encrypted user messaging (Reticulum bridge)      |
 
-2. **Review the Constitution**  
-  ```bash  
-  cat .specify/constitution.md  
-  ```  
+## Quick Start
 
-3. **Explore the Specifications**  
-  ```bash  
-  cat .specify/spec.md  
-  ```  
+### Prerequisites
 
-4. **Check the Implementation Plan**  
-  ```bash  
-  cat .specify/plan.md  
-  ```  
+- Python 3.11+
+- Meshtastic device (for transmission)
 
-5. **View Tasks**  
-  ```bash  
-  ls -la .specify/tasks/  
-  ```  
+### Installation
 
-6. **Initialize Terraform Infrastructure** (Optional)  
-  All repositories derived from this template include a baseline Terraform configuration for PR-CYBR agent standardization:
-  ```bash
-  cd infra
-  terraform init -backend=false
-  terraform validate
-  terraform plan -input=false -var-file=variables.tfvars
-  ```
-  
-  Before running these commands:
-  - Update `infra/variables.tfvars` with your agent-specific values
-  - Set sensitive values via environment variables (e.g., `export TF_VAR_dockerhub_user="username"`)
-  - See `.specify/tasks/infra-bootstrap.md` for detailed instructions
-  
-  **Note**: Derived projects inherit this baseline automatically for PR-CYBR agent alignment.
+```bash
+# Clone the repository
+git clone https://github.com/PR-CYBR/PR-CYBR-M3SH-BBS.git
+cd PR-CYBR-M3SH-BBS
 
-## Automated Provisioning  
-During initial provisioning of a new repository derived from this template, multiple draft pull requests are created to add the specification, plan and workflow files. Normally these PRs require manual review because branch protection rules on the default branch prevent automation from merging. To support fully autonomous initialization while preserving safety, this template includes an initial provisioning workflow (`initial-provision.yml`).  
-This workflow runs only once — when the repository has no prior commits or when triggered with `is_initial_provision` set to `true`. It will:  
-- Detect that the repository is in a bootstrap state.  
-- Temporarily disable branch protection on the default branch using the GitHub API.  
-- Mark any draft bootstrap pull requests as ready for review and merge them automatically.  
-- Reapply the previous branch protection settings immediately after the merges.  
-- Provision Terraform Cloud workspace (if `TFC_TOKEN` is configured).
-- Add a `bootstrap-complete` tag or commit annotation for auditability.  
-If automation is disabled or fails, you may still perform the first merge manually by approving the draft PRs. After the initial provisioning completes, the regular CI/CD workflows and branch protections govern subsequent development as usual. 
+# Install dependencies
+pip install -r requirements.txt
+```
 
-### Terraform Cloud Auto-Setup
-When you create a new repository from this template:
-- The Spec-Bootstrap system automatically provisions a TFC workspace during initial provisioning.
-- It synchronizes baseline variables from `/infra` to Terraform Cloud.
-- The workspace is tagged with "spec-bootstrap" and the repository name.
-- Secrets and API tokens are never stored in code — only injected via TFC or GitHub Secrets.
+### Generate Bulletins
 
-**Setup Requirements:**
-1. Add a `TFC_TOKEN` secret to your repository (Settings → Secrets and variables → Actions).
-2. Generate the token from Terraform Cloud: User Settings → Tokens → Create an API token.
-3. The initial provisioning workflow will automatically create and configure your workspace.
+```bash
+# Generate PR-MESH-BBS (public) bulletins
+python scripts/pr_mesh_bbs_generate.py --verbose
 
-**Note:** If `TFC_TOKEN` is not configured, the TFC bootstrap step will be skipped with a warning. You can add the token later and manually trigger the `tfc-bootstrap.yml` workflow.
-2. **Review the Constitution**  
-  ```bash  
-  cat .specify/constitution.md  
-  ```  
-3. **Explore the Specifications**  
-  ```bash  
-  cat .specify/spec.md  
-  ```  
-4. **Check the Implementation Plan**  
-  ```bash  
-  cat .specify/plan.md  
-  ```  
-5. **View Tasks**  
-  ```bash  
-  ls -la .specify/tasks/  
-  ```
+# Generate PR-CYBR-BBS (private) channel payloads
+python scripts/pr_cybr_bbs_generate.py --verbose
 
-## Spec Kit Commands  
-The Spec Kit framework has a set of conceptual commands that are represented by files in this template:  
-- `/speckit.constitution` – defines project rules and non‑negotiables.  
-- `/speckit.specify` – describes what to build and why.  
-- `/speckit.plan` – outlines how to build it.  
-- `/speckit.tasks` – breaks the plan into actionable tasks.
+# Generate M3SH-OPS network status report
+python scripts/m3sh_ops_report.py --human
+```
+
+### Validate Output
+
+```bash
+python scripts/validate_bbs_output.py --all --verbose
+```
+
+## Raspberry Pi Deployment
+
+On the Raspberry Pi with a connected Meshtastic device:
+
+```bash
+# Set the serial port (if not auto-detected)
+export MESH_SERIAL_PORT=/dev/ttyUSB0
+
+# Transmit PR-MESH-BBS bulletins on Channel-0
+python scripts/pr_mesh_bbs_tx.py --dry-run  # Test first
+python scripts/pr_mesh_bbs_tx.py
+
+# Transmit PR-CYBR-BBS on specific channel
+python scripts/pr_cybr_bbs_tx.py --channel 1 --dry-run
+python scripts/pr_cybr_bbs_tx.py --channel 1
+
+# Transmit to all private channels
+python scripts/pr_cybr_bbs_tx.py --all-channels
+```
+
+## MAILB0X (Encrypted Messaging)
+
+Channel-6 provides encrypted point-to-point messaging with passphrase-based access.
+
+### Add a Message
+
+```bash
+python scripts/mailbox_cli.py add \
+  --to "recipient-node-id" \
+  --from "sender-node-id" \
+  --body "Your secret message here" \
+  --passphrase "recipient-secret-passphrase"
+```
+
+### Read Messages
+
+```bash
+python scripts/mailbox_cli.py read \
+  --for "recipient-node-id" \
+  --passphrase "recipient-secret-passphrase"
+```
+
+### List Mailboxes
+
+```bash
+python scripts/mailbox_cli.py list
+```
+
+### Security Model
+
+- Messages are encrypted at rest using **AES-256-GCM**
+- Keys are derived from passphrases using **Argon2id** (or PBKDF2-SHA256 fallback)
+- Passphrases are **never stored** - they must be provided at read time
+- Each message uses a unique random salt and nonce
+
+## QR Code Generation
+
+Generate QR codes for joining PR-CYBR-BBS channels:
+
+```bash
+python scripts/generate_pr_cybr_qr_codes.py --verbose
+```
+
+QR codes are saved to `assets/qr/pr-cybr-bbs/`.
+
+To include channel PSKs, set environment variables before running:
+
+```bash
+export MESH_CH1_PSK="base64-encoded-psk"
+python scripts/generate_pr_cybr_qr_codes.py
+```
+
+## Directory Structure
+
+```
+config/
+├── hardware.yml              # Serial port, baud rate, device settings
+├── pr_mesh_bbs.yml           # Public BBS schedule and sources
+└── pr_cybr_bbs_channels.yml  # Private channel definitions
+
+data/
+├── pr-mesh-bbs/              # Public bulletin content
+│   ├── announcements/
+│   └── sitreps/
+├── pr-cybr-bbs/              # Private channel content
+│   ├── ops-sitrep/
+│   ├── s2-intel/
+│   ├── s3-plans/
+│   ├── m3sh-ops/
+│   ├── log-res/
+│   └── mailbox/
+├── status/
+│   └── nodes.json            # Node telemetry data
+└── mailboxes/                # Encrypted user mailboxes
+
+out/
+├── pr-mesh-bbs/              # Generated JSON outputs
+└── pr-cybr-bbs/
+
+assets/qr/pr-cybr-bbs/        # Channel join QR codes
+
+scripts/
+├── meshtastic_client.py      # Meshtastic device interface
+├── pr_mesh_bbs_generate.py   # Public BBS generator
+├── pr_mesh_bbs_tx.py         # Public BBS transmitter
+├── pr_cybr_bbs_generate.py   # Private BBS generator
+├── pr_cybr_bbs_tx.py         # Private BBS transmitter
+├── m3sh_ops_report.py        # Network status reporter
+├── mailbox_crypto.py         # Encryption primitives
+├── mailbox_ops.py            # Mailbox file operations
+├── mailbox_cli.py            # Mailbox command-line interface
+├── generate_pr_cybr_qr_codes.py  # QR code generator
+└── validate_bbs_output.py    # JSON schema validator
+
+tests/                        # Unit tests
+```
+
+## GitHub Actions
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| `pr-mesh-bbs-generate.yml` | Schedule (09:00, 18:00 AST) + Manual | Generate public bulletins |
+| `pr-cybr-bbs-qrs.yml` | Manual only | Generate channel QR codes |
+| `ci.yml` | Push/PR | Run tests and validation |
+
+## Configuration
+
+### Hardware (`config/hardware.yml`)
+
+```yaml
+serial:
+  port: null  # Auto-detect, or set to /dev/ttyUSB0
+  baud: 115200
+  timeout: 10
+
+runtime:
+  default_hop_limit: 3
+  max_message_size: 228
+```
+
+Override with environment variables:
+
+```bash
+export MESH_SERIAL_PORT=/dev/ttyACM0
+export MESH_BAUD=115200
+```
+
+### Schedules
+
+- **PR-MESH-BBS**: Broadcasts at 09:00 and 18:00 AST (Atlantic Standard Time, UTC-4)
+- **PR-CYBR-BBS**: Dispatch cycle at 09:00, 12:00, and 18:00 AST
+
+## Writing Bulletins
+
+Bulletins are authored as Markdown files with YAML frontmatter:
+
+```markdown
+---
+id: unique-bulletin-id
+title: Bulletin Title
+category: ANNOUNCEMENT
+priority: high
+valid_from: 2024-01-01T00:00:00Z
+valid_until: 2024-12-31T23:59:59Z
+---
+
+# Bulletin Title
+
+Your bulletin content goes here...
+```
+
+Place files in the appropriate `data/` directory:
+
+- `data/pr-mesh-bbs/announcements/` for public announcements
+- `data/pr-mesh-bbs/sitreps/` for situational reports
+- `data/pr-cybr-bbs/<channel>/` for private channel content
+
+## Testing
+
+```bash
+# Run all tests
+pytest tests/ -v
+
+# Test specific modules
+pytest tests/test_mailbox_crypto.py -v
+pytest tests/test_bbs_generate.py -v
+```
+
+## Branching Strategy
+
+- `main` - Stable baseline
+- `pr-mesh-bbs` - Configuration tuned for public BBS deployment
+- `pr-cybr-bbs` - Configuration tuned for private BBS deployment
+
+See [BRANCHING.md](BRANCHING.md) for the complete branching model.
+
+## Spec-Kit Integration
+
+This repository follows the Spec-Kit specification-driven development workflow:
+
+- `.specify/constitution.md` - Project principles and BBS-specific rules
+- `.specify/spec.md` - Technical specifications
+- `.specify/plan.md` - Implementation roadmap
+- `.specify/tasks/` - Individual task specifications
+
+## License
+
+This project is released under the [MIT License](LICENSE).
