@@ -235,18 +235,18 @@ async function renderWorkflowCards() {
     const workflowUrl = `https://github.com/${CONFIG.owner}/${CONFIG.repo}/actions/workflows/${workflow.file}`;
     
     html += `
-      <div class="workflow-card">
+      <div class="workflow-card" data-workflow-key="${escapeHtml(key)}">
         <div class="workflow-card-header">
-          <span class="workflow-name">${workflow.name}</span>
-          <span class="workflow-status workflow-status--${statusClass}">${statusText}</span>
+          <span class="workflow-name">${escapeHtml(workflow.name)}</span>
+          <span class="workflow-status workflow-status--${statusClass}">${escapeHtml(statusText)}</span>
         </div>
-        <p class="workflow-description">${workflow.description}</p>
+        <p class="workflow-description">${escapeHtml(workflow.description)}</p>
         <p class="workflow-timestamp">Last run: ${formatRelativeTime(status.updated_at)}</p>
         <div class="workflow-actions">
-          <a href="${workflowUrl}" target="_blank" rel="noopener" class="btn btn--primary">
+          <a href="${escapeHtml(workflowUrl)}" target="_blank" rel="noopener" class="btn btn--primary">
             View in GitHub Actions
           </a>
-          <button class="btn btn--secondary" onclick="copyToClipboard('${ghCommand}')">
+          <button class="btn btn--secondary copy-gh-cmd" data-command="${escapeHtml(ghCommand)}">
             Copy gh command
           </button>
         </div>
@@ -255,6 +255,14 @@ async function renderWorkflowCards() {
   });
   
   container.innerHTML = html;
+  
+  // Attach event listeners for copy buttons
+  container.querySelectorAll('.copy-gh-cmd').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const command = btn.dataset.command;
+      copyToClipboard(command);
+    });
+  });
   
   // Update overall status pill
   updateOverallStatus(overallStatus);
@@ -429,21 +437,30 @@ async function renderQrCodes() {
   Object.keys(CONFIG.qrAssets.channels).forEach(num => {
     const qrConfig = CONFIG.qrAssets.channels[num];
     const channel = CONFIG.channels[num];
-    const imagePath = `${basePath}${CONFIG.qrAssets.basePath}/${qrConfig.file}`;
+    const imagePath = `${basePath}${CONFIG.qrAssets.basePath}/${escapeHtml(qrConfig.file)}`;
     
     html += `
       <div class="qr-card">
-        <div class="qr-image" id="qr-image-${num}">
-          <img src="${imagePath}" alt="QR Code for ${qrConfig.name}" 
-               onerror="this.parentElement.innerHTML='<span class=\\'qr-image-placeholder\\'>QR not available</span>'" />
+        <div class="qr-image" id="qr-image-${escapeHtml(num)}">
+          <img src="${imagePath}" alt="QR Code for ${escapeHtml(qrConfig.name)}" data-channel="${escapeHtml(num)}" />
         </div>
-        <div class="qr-channel-name">Channel ${num}: ${qrConfig.name}</div>
-        <p class="qr-description">Scan to join ${channel.description}</p>
+        <div class="qr-channel-name">Channel ${escapeHtml(num)}: ${escapeHtml(qrConfig.name)}</div>
+        <p class="qr-description">Scan to join ${escapeHtml(channel.description)}</p>
       </div>
     `;
   });
   
   container.innerHTML = html;
+  
+  // Attach error handlers for QR images using event delegation
+  container.querySelectorAll('.qr-image img').forEach(img => {
+    img.addEventListener('error', function() {
+      const placeholder = document.createElement('span');
+      placeholder.className = 'qr-image-placeholder';
+      placeholder.textContent = 'QR not available';
+      this.parentElement.replaceChild(placeholder, this);
+    });
+  });
 }
 
 /**
