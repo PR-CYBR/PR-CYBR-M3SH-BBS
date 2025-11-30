@@ -145,11 +145,17 @@ config/
 └── pr_cybr_bbs_channels.yml  # Private channel definitions
 
 dashboard/
-├── index.html                # Dashboard main page
+├── index.html                # Dashboard main page (multi-view navigation)
 ├── app.js                    # Dashboard JavaScript logic
 ├── styles.css                # Dashboard styling
 ├── config.js                 # Dashboard configuration
-└── state.json                # Auto-updated BBS state data
+├── state.json                # Auto-updated BBS state data
+└── js/                       # JavaScript modules
+    ├── meshtasticDeviceClient.js  # Web Serial/Bluetooth device client
+    ├── mapView.js             # Leaflet map visualization
+    ├── messagesView.js        # Messages/BBS feed UI
+    ├── deviceSettingsView.js  # Device settings UI
+    └── dashboardHealth.js     # Health/freshness indicators
 
 data/
 ├── pr-mesh-bbs/              # Public bulletin content
@@ -164,7 +170,8 @@ data/
 │   └── mailbox/
 ├── status/
 │   └── nodes.json            # Node telemetry data
-└── mailboxes/                # Encrypted user mailboxes
+├── mailboxes/                # Encrypted user mailboxes
+└── qr_manifest.json          # QR code manifest for dashboard
 
 out/
 ├── pr-mesh-bbs/              # Generated JSON outputs
@@ -189,18 +196,39 @@ scripts/
 tests/                        # Unit tests
 ```
 
+## Running the Dashboard Locally
+
+The dashboard is a static site that can be served with any HTTP server:
+
+```bash
+# Using Python
+cd dashboard
+python -m http.server 8000
+
+# Using Node.js (npx)
+npx serve dashboard
+
+# Using PHP
+cd dashboard
+php -S localhost:8000
+```
+
+Then open http://localhost:8000 in your browser.
+
+**Note:** Device connection features (Web Serial/Bluetooth) require a secure context (HTTPS or localhost).
+
 ## GitHub Actions
 
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
 | `pr-mesh-bbs-generate.yml` | Schedule (09:00, 18:00 AST) + Manual | Generate public bulletins |
-| `pr-cybr-bbs-qrs.yml` | Manual only | Generate channel QR codes |
+| `pr-cybr-bbs-qrs.yml` | Schedule (daily) + Push + Manual | Generate channel QR codes |
 | `ci.yml` | Push/PR | Run tests and validation |
 | `dashboard-pages.yml` | Push to main + Manual | Deploy web dashboard |
 
 ## Web Dashboard
 
-This project includes an interactive web dashboard deployed via GitHub Pages.
+This project includes an interactive multi-view web dashboard deployed via GitHub Pages.
 
 ### Dashboard URL
 
@@ -208,14 +236,40 @@ Once GitHub Pages is enabled, the dashboard will be available at:
 
 **https://pr-cybr.github.io/PR-CYBR-M3SH-BBS/**
 
+### Dashboard Views
+
+The dashboard is organized into multiple views accessible via the navigation tabs:
+
+| View | Description |
+|------|-------------|
+| **Dashboard** | Overview with System Health, workflow status, bulletins, and node status |
+| **Messages & BBS** | Chat-style message browser with search, filtering, and compose functionality |
+| **Devices & Channels** | Device connection (Web Serial/Bluetooth) and channel import/export |
+| **Device Settings** | Meshtastic device configuration UI with profile management |
+| **Map** | Leaflet-based map visualization of mesh nodes over Puerto Rico |
+
 ### Dashboard Features
 
-- **Workflow Status**: Monitor the status of GitHub Actions workflows with one-click links to trigger manual runs
-- **Public Bulletins**: View current PR-MESH-BBS public bulletins
+- **System Health Card**: Data freshness indicators for telemetry, bulletins, and QR codes
+- **Workflow Status**: Monitor GitHub Actions workflows with one-click links
+- **Public Bulletins**: View current PR-MESH-BBS public bulletins with stale warnings
 - **Private Channels**: Browse summaries from all 6 PR-CYBR-BBS private channels
 - **QR Codes**: Display QR codes for joining each private channel
-- **Node Status**: Real-time node telemetry from M3SH-OPS (Channel 4)
+- **Node Status**: Real-time node telemetry with freshness badges (Fresh/Stale/Offline)
+- **Map View**: Interactive map with node markers, filtering, and legends
+- **Messages View**: Unified message browser across all channels with search and compose
+- **Device Connection**: Connect via Web Serial or Web Bluetooth (modern browsers)
+- **Device Settings**: Configure device profiles with import/export support
 - **Auto-refresh**: Dashboard data refreshes automatically every 5 minutes
+
+### Browser Requirements for Device Connection
+
+Device connection features (Web Serial API, Web Bluetooth API) require:
+- **Chrome**, **Edge**, or **Opera** on desktop
+- HTTPS or localhost origin
+- User gesture to initiate connection
+
+Older browsers can still use all other dashboard features.
 
 ### Enabling GitHub Pages
 

@@ -1,0 +1,11 @@
+{
+  "generatedAt": "2025-11-30T00:00:00Z",
+  "channels": [
+    { "id": 1, "name": "OPS-SITREP", "qrPath": "assets/qr/pr-cybr-bbs/channel-1-OPS-SITREP.png" },
+    { "id": 2, "name": "S2-INTEL", "qrPath": "assets/qr/pr-cybr-bbs/channel-2-S2-INTEL.png" },
+    { "id": 3, "name": "S3-PLANS", "qrPath": "assets/qr/pr-cybr-bbs/channel-3-S3-PLANS.png" },
+    { "id": 4, "name": "M3SH-OPS", "qrPath": "assets/qr/pr-cybr-bbs/channel-4-M3SH-OPS.png" },
+    { "id": 5, "name": "LOG-RES", "qrPath": "assets/qr/pr-cybr-bbs/channel-5-LOG-RES.png" },
+    { "id": 6, "name": "MAILB0X", "qrPath": "assets/qr/pr-cybr-bbs/channel-6-MAILB0X.png" }
+  ]
+}

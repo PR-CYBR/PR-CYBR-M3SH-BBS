@@ -2,6 +2,15 @@ name: PR-CYBR-BBS QR Codes
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'config/pr_cybr_bbs_channels.yml'
+      - 'scripts/generate_pr_cybr_qr_codes.py'
+  schedule:
+    # Run once per day at 06:00 UTC (02:00 AST)
+    - cron: '0 6 * * *'
 
 permissions:
   contents: write
@@ -37,7 +46,31 @@ jobs:
           # etc.
           PYTHONUNBUFFERED: '1'
       
-      - name: Commit QR codes
+      - name: Generate QR manifest
+        run: |
+          python -c "
+          import json
+          from datetime import datetime, timezone
+          
+          manifest = {
+            'generatedAt': datetime.now(timezone.utc).isoformat(),
+            'channels': [
+              {'id': 1, 'name': 'OPS-SITREP', 'qrPath': 'assets/qr/pr-cybr-bbs/channel-1-OPS-SITREP.png'},
+              {'id': 2, 'name': 'S2-INTEL', 'qrPath': 'assets/qr/pr-cybr-bbs/channel-2-S2-INTEL.png'},
+              {'id': 3, 'name': 'S3-PLANS', 'qrPath': 'assets/qr/pr-cybr-bbs/channel-3-S3-PLANS.png'},
+              {'id': 4, 'name': 'M3SH-OPS', 'qrPath': 'assets/qr/pr-cybr-bbs/channel-4-M3SH-OPS.png'},
+              {'id': 5, 'name': 'LOG-RES', 'qrPath': 'assets/qr/pr-cybr-bbs/channel-5-LOG-RES.png'},
+              {'id': 6, 'name': 'MAILB0X', 'qrPath': 'assets/qr/pr-cybr-bbs/channel-6-MAILB0X.png'}
+            ]
+          }
+          
+          with open('data/qr_manifest.json', 'w') as f:
+            json.dump(manifest, f, indent=2)
+          
+          print(f'Generated QR manifest with {len(manifest[\"channels\"])} channels')
+          "
+      
+      - name: Commit QR codes and manifest
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
@@ -45,7 +78,7 @@ jobs:
           # Export dashboard state
           python scripts/export_dashboard_state.py --workflow-type cybr --verbose
           
-          git add assets/qr/pr-cybr-bbs/ dashboard/state.json
+          git add assets/qr/pr-cybr-bbs/ dashboard/state.json data/qr_manifest.json
           
           if git diff --staged --quiet; then
             echo "No changes to commit"
