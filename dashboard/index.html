@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PR-CYBR Meshtastic BBS Dashboard - Monitor public and private mesh network bulletin boards">
+  <title>PR-CYBR Meshtastic BBS Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Favicon using emoji as placeholder -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📡</text></svg>">
+</head>
+<body>
+  <!-- Header / Hero Section -->
+  <header class="header">
+    <div class="header-content">
+      <div>
+        <h1 class="header-title">📡 PR-CYBR Meshtastic BBS Dashboard</h1>
+        <p class="header-subtitle">
+          <strong>PR-MESH-BBS</strong> (Public, Channel 0) · 
+          <strong>PR-CYBR-BBS</strong> (Private, Channels 1–6)
+        </p>
+      </div>
+      <div class="header-info">
+        <div id="overall-status" class="status-pill status-pill--unknown">
+          <span class="status-dot"></span>Loading...
+        </div>
+        <button id="refresh-btn" class="refresh-btn" title="Refresh dashboard data">
+          <span class="refresh-icon">↻</span>
+          Refresh
+        </button>
+        <span id="last-update" class="last-update">Last updated: --</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Workflow Controls & Status Section -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">⚙️ Workflow Status & Controls</h2>
+      </div>
+      <div class="section-content">
+        <div id="workflow-grid" class="workflow-grid">
+          <div class="loading"><div class="loading-spinner"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Public BBS (PR-MESH-BBS) Section -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">📢 Public BBS (PR-MESH-BBS)</h2>
+      </div>
+      <div class="section-content">
+        <div id="bulletins-container">
+          <div class="loading"><div class="loading-spinner"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Private BBS Channels (PR-CYBR-BBS) Section -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">🔒 Private BBS Channels (PR-CYBR-BBS)</h2>
+      </div>
+      <div id="channel-tabs" class="channel-tabs">
+        <!-- Tabs will be dynamically generated -->
+      </div>
+      <div id="channel-contents">
+        <!-- Channel content will be dynamically generated -->
+      </div>
+    </section>
+
+    <!-- QR Codes Section -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">📲 Channel QR Codes</h2>
+      </div>
+      <div class="section-content">
+        <div id="qr-grid" class="qr-grid">
+          <div class="loading"><div class="loading-spinner"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Node Status (M3SH-OPS) Section -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">📍 Node Status (M3SH-OPS)</h2>
+      </div>
+      <div class="section-content">
+        <div id="nodes-grid" class="nodes-grid">
+          <div class="loading"><div class="loading-spinner"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Debug / Meta Info Panel -->
+    <div id="debug-panel" class="debug-panel">
+      <div class="debug-header">
+        <div class="debug-title">
+          <span>🔧</span>
+          Debug Info
+        </div>
+        <span class="debug-toggle">▼</span>
+      </div>
+      <div class="debug-content">
+        <ul id="debug-log" class="debug-log">
+          <!-- Debug logs will be dynamically added -->
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast notification container -->
+  <div id="toast" class="toast"></div>
+
+  <!-- JavaScript files -->
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

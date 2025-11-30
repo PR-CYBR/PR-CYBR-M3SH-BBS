@@ -1,5 +1,6 @@
 [![Spec-Kit Validation](https://github.com/PR-CYBR/PR-CYBR-M3SH-BBS/actions/workflows/spec-kit.yml/badge.svg?branch=main)](https://github.com/PR-CYBR/PR-CYBR-M3SH-BBS/actions/workflows/spec-kit.yml)
 [![CI](https://github.com/PR-CYBR/PR-CYBR-M3SH-BBS/actions/workflows/ci.yml/badge.svg)](https://github.com/PR-CYBR/PR-CYBR-M3SH-BBS/actions/workflows/ci.yml)
+[![Dashboard](https://github.com/PR-CYBR/PR-CYBR-M3SH-BBS/actions/workflows/dashboard-pages.yml/badge.svg)](https://github.com/PR-CYBR/PR-CYBR-M3SH-BBS/actions/workflows/dashboard-pages.yml)
 
 # PR-CYBR Meshtastic BBS
 
@@ -143,6 +144,13 @@ config/
 ├── pr_mesh_bbs.yml           # Public BBS schedule and sources
 └── pr_cybr_bbs_channels.yml  # Private channel definitions
 
+dashboard/
+├── index.html                # Dashboard main page
+├── app.js                    # Dashboard JavaScript logic
+├── styles.css                # Dashboard styling
+├── config.js                 # Dashboard configuration
+└── state.json                # Auto-updated BBS state data
+
 data/
 ├── pr-mesh-bbs/              # Public bulletin content
 │   ├── announcements/
@@ -175,6 +183,7 @@ scripts/
 ├── mailbox_ops.py            # Mailbox file operations
 ├── mailbox_cli.py            # Mailbox command-line interface
 ├── generate_pr_cybr_qr_codes.py  # QR code generator
+├── export_dashboard_state.py # Dashboard state exporter
 └── validate_bbs_output.py    # JSON schema validator
 
 tests/                        # Unit tests
@@ -187,6 +196,39 @@ tests/                        # Unit tests
 | `pr-mesh-bbs-generate.yml` | Schedule (09:00, 18:00 AST) + Manual | Generate public bulletins |
 | `pr-cybr-bbs-qrs.yml` | Manual only | Generate channel QR codes |
 | `ci.yml` | Push/PR | Run tests and validation |
+| `dashboard-pages.yml` | Push to main + Manual | Deploy web dashboard |
+
+## Web Dashboard
+
+This project includes an interactive web dashboard deployed via GitHub Pages.
+
+### Dashboard URL
+
+Once GitHub Pages is enabled, the dashboard will be available at:
+
+**https://pr-cybr.github.io/PR-CYBR-M3SH-BBS/**
+
+### Dashboard Features
+
+- **Workflow Status**: Monitor the status of GitHub Actions workflows with one-click links to trigger manual runs
+- **Public Bulletins**: View current PR-MESH-BBS public bulletins
+- **Private Channels**: Browse summaries from all 6 PR-CYBR-BBS private channels
+- **QR Codes**: Display QR codes for joining each private channel
+- **Node Status**: Real-time node telemetry from M3SH-OPS (Channel 4)
+- **Auto-refresh**: Dashboard data refreshes automatically every 5 minutes
+
+### Enabling GitHub Pages
+
+1. Go to **Settings** → **Pages** in the repository
+2. Under **Build and deployment**, select **GitHub Actions** as the source
+3. The dashboard workflow will automatically deploy on pushes to `main`
+
+### Security
+
+The dashboard is read-only and safe for public viewing:
+- No API tokens or secrets are embedded in the frontend
+- Workflow triggering requires authentication via GitHub UI or CLI
+- All data is fetched from public GitHub APIs or static JSON files
 
 ## Configuration
 

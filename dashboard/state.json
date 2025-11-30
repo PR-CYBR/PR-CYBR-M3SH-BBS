@@ -1,0 +1,23 @@
+{
+  "generated_at": "2025-11-30T18:46:02.617880+00:00",
+  "mesh_public": {
+    "last_run": "2025-11-30T18:46:02.617880+00:00",
+    "last_status": "success",
+    "last_run_id": 19803176734,
+    "bulletin_count": 2,
+    "generated_at": "2025-11-30T18:45:48.865218+00:00"
+  },
+  "cybr_private": {
+    "last_run": "2025-11-30T18:46:02.617880+00:00",
+    "last_status": "success",
+    "channel_counts": {
+      "1": 1,
+      "2": 1,
+      "3": 1,
+      "4": 5,
+      "5": 1,
+      "6": 1
+    },
+    "last_run_id": 19803176734
+  }
+}
