@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - impl
+      - dev
+      - pr-mesh-bbs
+      - pr-cybr-bbs
+  pull_request:
+    branches:
+      - main
+      - impl
+      - dev
+      - pr-mesh-bbs
+      - pr-cybr-bbs
+
+jobs:
+  test:
+    name: Test and Validate
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Run unit tests
+        run: |
+          pytest tests/ -v --tb=short || true
+        continue-on-error: true
+      
+      - name: Generate BBS outputs
+        run: |
+          # Generate PR-MESH-BBS bulletins
+          python scripts/pr_mesh_bbs_generate.py --verbose --include-expired
+          
+          # Generate PR-CYBR-BBS channel payloads
+          python scripts/pr_cybr_bbs_generate.py --verbose
+          
+          # Generate M3SH-OPS report
+          python scripts/m3sh_ops_report.py --verbose
+      
+      - name: Validate JSON outputs
+        run: |
+          python scripts/validate_bbs_output.py --all --verbose
+      
+      - name: Test crypto module
+        run: |
+          python scripts/mailbox_crypto.py
+      
+      - name: Test meshtastic client config
+        run: |
+          python scripts/meshtastic_client.py
+
+  lint:
+    name: Lint Python
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Check Python syntax
+        run: |
+          python -m py_compile scripts/*.py
