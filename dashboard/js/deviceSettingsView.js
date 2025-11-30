@@ -563,9 +563,38 @@ function attachEventListeners(container) {
       reader.onload = function(e) {
         try {
           const imported = JSON.parse(e.target.result);
-          if (imported.name && imported.radio) {
-            currentProfile = imported;
-            currentProfile.id = currentProfile.id || `imported-${Date.now()}`;
+          // Validate and sanitize imported profile to prevent prototype pollution
+          if (imported && typeof imported === 'object' && imported.name && imported.radio) {
+            // Create a clean profile object with only expected properties
+            const sanitizedProfile = {
+              id: typeof imported.id === 'string' ? imported.id : `imported-${Date.now()}`,
+              name: String(imported.name || ''),
+              description: String(imported.description || ''),
+              role: String(imported.role || 'relay'),
+              radio: {
+                region: String(imported.radio?.region || 'US'),
+                modemPreset: String(imported.radio?.modemPreset || 'LongFast'),
+                txPower: Number(imported.radio?.txPower) || 30,
+                hopLimit: Number(imported.radio?.hopLimit) || 3,
+                frequencySlot: Number(imported.radio?.frequencySlot) || 0
+              },
+              bbs: {
+                defaultChannel: Number(imported.bbs?.defaultChannel) || 0,
+                messageRetention: Number(imported.bbs?.messageRetention) || 100,
+                priorityDefault: String(imported.bbs?.priorityDefault || 'normal')
+              },
+              power: {
+                isRouter: Boolean(imported.power?.isRouter),
+                sleepEnabled: imported.power?.sleepEnabled !== false,
+                sleepInterval: Number(imported.power?.sleepInterval) || 3600,
+                gpsEnabled: imported.power?.gpsEnabled !== false,
+                positionInterval: Number(imported.power?.positionInterval) || 900,
+                telemetryInterval: Number(imported.power?.telemetryInterval) || 1800
+              },
+              createdAt: String(imported.createdAt || new Date().toISOString()),
+              updatedAt: new Date().toISOString()
+            };
+            currentProfile = sanitizedProfile;
             saveProfiles();
             renderDeviceSettingsView(container);
             showToast('Profile imported!');

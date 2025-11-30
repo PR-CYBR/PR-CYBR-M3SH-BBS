@@ -193,8 +193,8 @@ export function initMap(containerId) {
     console.error('Leaflet library not loaded');
     container.innerHTML = `
       <div class="map-error">
-        <p>⚠️ Map library not loaded</p>
-        <p>Please check your internet connection.</p>
+        <p>⚠️ Map library unavailable</p>
+        <p>The map requires the Leaflet library which could not be loaded.</p>
       </div>
     `;
     return null;

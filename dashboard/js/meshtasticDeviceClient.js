@@ -7,7 +7,11 @@
  */
 
 // Feature flag for testing on GitHub Pages (static hosting)
-const USE_MESHTASTIC_MOCKS = true;
+// Set to false when deploying with real Meshtastic device support
+// Can be overridden by setting window.USE_MESHTASTIC_MOCKS = false before loading
+const USE_MESHTASTIC_MOCKS = window.USE_MESHTASTIC_MOCKS !== undefined 
+  ? window.USE_MESHTASTIC_MOCKS 
+  : true;
 
 /**
  * @typedef {Object} ChannelConfig

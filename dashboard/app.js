@@ -1132,14 +1132,37 @@ function updateMapNodes(nodes) {
           <tr><td>Location:</td><td>${location}</td></tr>
         </table>
         <div class="map-popup-actions">
-          <button class="btn btn--small btn--secondary" onclick="copyToClipboard('${escapeHtml(node.node_id)}')">📋 Copy ID</button>
-          <button class="btn btn--small btn--secondary" onclick="switchView('dashboard');document.getElementById('node-status-section').scrollIntoView({behavior:'smooth'})">📍 Dashboard</button>
+          <button class="btn btn--small btn--secondary map-copy-id" data-node-id="${escapeHtml(node.node_id)}">📋 Copy ID</button>
+          <button class="btn btn--small btn--secondary map-goto-dashboard">📍 Dashboard</button>
         </div>
       </div>
     `;
     
     const marker = L.marker([node.location.lat, node.location.lon], { icon: svgIcon })
       .bindPopup(popupContent);
+    
+    // Attach event listeners after popup opens (event delegation pattern)
+    marker.on('popupopen', function() {
+      const popup = marker.getPopup().getElement();
+      if (popup) {
+        const copyBtn = popup.querySelector('.map-copy-id');
+        if (copyBtn) {
+          copyBtn.addEventListener('click', function() {
+            copyToClipboard(this.dataset.nodeId);
+          });
+        }
+        const dashboardBtn = popup.querySelector('.map-goto-dashboard');
+        if (dashboardBtn) {
+          dashboardBtn.addEventListener('click', function() {
+            switchView('dashboard');
+            const section = document.getElementById('node-status-section');
+            if (section) {
+              section.scrollIntoView({ behavior: 'smooth' });
+            }
+          });
+        }
+      }
+    });
     
     markersLayer.addLayer(marker);
   });
