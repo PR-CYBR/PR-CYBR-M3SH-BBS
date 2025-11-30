@@ -8,6 +8,10 @@
   <link rel="stylesheet" href="styles.css">
   <!-- Favicon using emoji as placeholder -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📡</text></svg>">
+  <!-- Leaflet CSS for Map View -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+        crossorigin="">
 </head>
 <body>
   <!-- Header / Hero Section -->
@@ -33,87 +37,279 @@
     </div>
   </header>
 
+  <!-- Navigation Tabs -->
+  <nav class="nav-tabs" role="navigation" aria-label="Main navigation">
+    <div class="nav-tabs-container">
+      <button class="nav-tab active" data-view="dashboard" aria-selected="true">
+        <span class="nav-tab-icon">📊</span>
+        <span class="nav-tab-label">Dashboard</span>
+      </button>
+      <button class="nav-tab" data-view="messages" aria-selected="false">
+        <span class="nav-tab-icon">💬</span>
+        <span class="nav-tab-label">Messages & BBS</span>
+      </button>
+      <button class="nav-tab" data-view="devices" aria-selected="false">
+        <span class="nav-tab-icon">📱</span>
+        <span class="nav-tab-label">Devices & Channels</span>
+      </button>
+      <button class="nav-tab" data-view="settings" aria-selected="false">
+        <span class="nav-tab-icon">⚙️</span>
+        <span class="nav-tab-label">Device Settings</span>
+      </button>
+      <button class="nav-tab" data-view="map" aria-selected="false">
+        <span class="nav-tab-icon">🗺️</span>
+        <span class="nav-tab-label">Map</span>
+      </button>
+    </div>
+  </nav>
+
   <main class="container">
-    <!-- Workflow Controls & Status Section -->
-    <section class="section">
-      <div class="section-header">
-        <h2 class="section-title">⚙️ Workflow Status & Controls</h2>
-      </div>
-      <div class="section-content">
-        <div id="workflow-grid" class="workflow-grid">
-          <div class="loading"><div class="loading-spinner"></div></div>
+    <!-- Dashboard View (Default) -->
+    <div id="view-dashboard" class="view active" data-view="dashboard">
+      <!-- System Health Card -->
+      <section class="section section--health">
+        <div id="health-card-container">
+          <div class="health-card health-card--unknown">
+            <div class="health-card-header">
+              <h3>📊 System Health</h3>
+              <span class="health-badge health-badge--unknown">Loading...</span>
+            </div>
+            <div class="health-card-content">
+              <div class="loading"><div class="loading-spinner"></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Workflow Controls & Status Section -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">⚙️ Workflow Status & Controls</h2>
+        </div>
+        <div class="section-content">
+          <div id="workflow-grid" class="workflow-grid">
+            <div class="loading"><div class="loading-spinner"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Public BBS (PR-MESH-BBS) Section -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">📢 Public BBS (PR-MESH-BBS)</h2>
+        </div>
+        <div class="section-content">
+          <div id="bulletins-container">
+            <div class="loading"><div class="loading-spinner"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Private BBS Channels (PR-CYBR-BBS) Section -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">🔒 Private BBS Channels (PR-CYBR-BBS)</h2>
+        </div>
+        <div id="channel-tabs" class="channel-tabs">
+          <!-- Tabs will be dynamically generated -->
+        </div>
+        <div id="channel-contents">
+          <!-- Channel content will be dynamically generated -->
+        </div>
+      </section>
+
+      <!-- QR Codes Section -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">📲 Channel QR Codes</h2>
+        </div>
+        <div class="section-content">
+          <div id="qr-grid" class="qr-grid">
+            <div class="loading"><div class="loading-spinner"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Node Status (M3SH-OPS) Section -->
+      <section class="section" id="node-status-section">
+        <div class="section-header">
+          <h2 class="section-title">📍 Node Status (M3SH-OPS)</h2>
+        </div>
+        <div class="section-content">
+          <div id="nodes-grid" class="nodes-grid">
+            <div class="loading"><div class="loading-spinner"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Debug / Meta Info Panel -->
+      <div id="debug-panel" class="debug-panel">
+        <div class="debug-header">
+          <div class="debug-title">
+            <span>🔧</span>
+            Debug Info
+          </div>
+          <span class="debug-toggle">▼</span>
+        </div>
+        <div class="debug-content">
+          <ul id="debug-log" class="debug-log">
+            <!-- Debug logs will be dynamically added -->
+          </ul>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- Public BBS (PR-MESH-BBS) Section -->
-    <section class="section">
-      <div class="section-header">
-        <h2 class="section-title">📢 Public BBS (PR-MESH-BBS)</h2>
+    <!-- Messages & BBS View -->
+    <div id="view-messages" class="view" data-view="messages">
+      <div id="messages-view-container">
+        <div class="loading"><div class="loading-spinner"></div></div>
       </div>
-      <div class="section-content">
-        <div id="bulletins-container">
-          <div class="loading"><div class="loading-spinner"></div></div>
+    </div>
+
+    <!-- Devices & Channels View -->
+    <div id="view-devices" class="view" data-view="devices">
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">📱 Device Connection</h2>
         </div>
-      </div>
-    </section>
-
-    <!-- Private BBS Channels (PR-CYBR-BBS) Section -->
-    <section class="section">
-      <div class="section-header">
-        <h2 class="section-title">🔒 Private BBS Channels (PR-CYBR-BBS)</h2>
-      </div>
-      <div id="channel-tabs" class="channel-tabs">
-        <!-- Tabs will be dynamically generated -->
-      </div>
-      <div id="channel-contents">
-        <!-- Channel content will be dynamically generated -->
-      </div>
-    </section>
-
-    <!-- QR Codes Section -->
-    <section class="section">
-      <div class="section-header">
-        <h2 class="section-title">📲 Channel QR Codes</h2>
-      </div>
-      <div class="section-content">
-        <div id="qr-grid" class="qr-grid">
-          <div class="loading"><div class="loading-spinner"></div></div>
+        <div class="section-content">
+          <div id="device-connection-status" class="connection-status">
+            <div class="connection-status-indicator">
+              <span class="status-dot status-dot--disconnected"></span>
+              <span id="connection-text">Not Connected</span>
+            </div>
+          </div>
+          
+          <div id="connection-support-warning" class="support-warning" style="display: none;">
+            <p>⚠️ <strong>Device connection is only available in modern browsers over HTTPS or when running locally.</strong></p>
+            <p>The rest of the dashboard will still work.</p>
+          </div>
+          
+          <div class="connection-buttons">
+            <button id="connect-serial-btn" class="btn btn--primary">
+              🔌 Connect via USB (Web Serial)
+            </button>
+            <button id="connect-bluetooth-btn" class="btn btn--primary">
+              📶 Connect via Bluetooth (Web Bluetooth)
+            </button>
+            <button id="connect-network-btn" class="btn btn--secondary" disabled title="Coming soon">
+              🌐 Connect via Network API
+            </button>
+            <button id="disconnect-btn" class="btn btn--secondary" style="display: none;">
+              ❌ Disconnect
+            </button>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- Node Status (M3SH-OPS) Section -->
-    <section class="section">
-      <div class="section-header">
-        <h2 class="section-title">📍 Node Status (M3SH-OPS)</h2>
-      </div>
-      <div class="section-content">
-        <div id="nodes-grid" class="nodes-grid">
-          <div class="loading"><div class="loading-spinner"></div></div>
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">📋 BBS Channel Configuration</h2>
         </div>
-      </div>
-    </section>
+        <div class="section-content">
+          <div id="channels-table-container">
+            <table class="channels-table">
+              <thead>
+                <tr>
+                  <th>Ch</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Modem</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="channels-table-body">
+                <!-- Will be populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="channel-actions">
+            <button id="import-from-device-btn" class="btn btn--secondary" disabled>
+              📥 Import Channels FROM Device
+            </button>
+            <button id="export-to-device-btn" class="btn btn--secondary" disabled>
+              📤 Export Channels TO Device
+            </button>
+          </div>
+        </div>
+      </section>
 
-    <!-- Debug / Meta Info Panel -->
-    <div id="debug-panel" class="debug-panel">
-      <div class="debug-header">
-        <div class="debug-title">
-          <span>🔧</span>
-          Debug Info
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">💾 Offline Channel Management</h2>
         </div>
-        <span class="debug-toggle">▼</span>
+        <div class="section-content">
+          <p class="section-description">
+            For Git-based workflows, you can download or upload channel configurations as JSON files.
+          </p>
+          <div class="offline-actions">
+            <button id="download-channels-btn" class="btn btn--secondary">
+              📥 Download Channels as JSON
+            </button>
+            <label class="btn btn--secondary">
+              📤 Upload Channels from JSON
+              <input type="file" id="upload-channels-input" accept=".json" hidden>
+            </label>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Device Settings View -->
+    <div id="view-settings" class="view" data-view="settings">
+      <div id="device-settings-container">
+        <div class="loading"><div class="loading-spinner"></div></div>
       </div>
-      <div class="debug-content">
-        <ul id="debug-log" class="debug-log">
-          <!-- Debug logs will be dynamically added -->
-        </ul>
-      </div>
+    </div>
+
+    <!-- Map View -->
+    <div id="view-map" class="view" data-view="map">
+      <section class="section section--map">
+        <div class="section-header">
+          <h2 class="section-title">🗺️ Mesh Network Map</h2>
+          <div class="map-controls">
+            <button id="map-reset-btn" class="btn btn--secondary btn--small">
+              🎯 Reset View
+            </button>
+            <button id="map-fit-btn" class="btn btn--secondary btn--small">
+              📍 Fit to Nodes
+            </button>
+          </div>
+        </div>
+        <div class="map-filters">
+          <span class="filter-label">Show:</span>
+          <label class="map-filter-checkbox">
+            <input type="checkbox" id="filter-gateway" checked>
+            <span style="color: #00d4aa">● Gateway</span>
+          </label>
+          <label class="map-filter-checkbox">
+            <input type="checkbox" id="filter-relay" checked>
+            <span style="color: #2196f3">● Relay</span>
+          </label>
+          <label class="map-filter-checkbox">
+            <input type="checkbox" id="filter-sensor" checked>
+            <span style="color: #ffc107">● Sensor</span>
+          </label>
+          <label class="map-filter-checkbox">
+            <input type="checkbox" id="filter-other" checked>
+            <span style="color: #6b7280">● Other</span>
+          </label>
+        </div>
+        <div id="map-container" class="map-container">
+          <!-- Leaflet map will be initialized here -->
+        </div>
+      </section>
     </div>
   </main>
 
   <!-- Toast notification container -->
   <div id="toast" class="toast"></div>
+
+  <!-- Leaflet JS for Map View -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+          crossorigin=""></script>
 
   <!-- JavaScript files -->
   <script src="config.js"></script>
