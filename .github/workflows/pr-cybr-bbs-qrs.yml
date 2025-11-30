@@ -5,6 +5,7 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 jobs:
   generate-qr:
@@ -41,11 +42,14 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           
-          git add assets/qr/pr-cybr-bbs/
+          # Export dashboard state
+          python scripts/export_dashboard_state.py --workflow-type cybr --verbose
+          
+          git add assets/qr/pr-cybr-bbs/ dashboard/state.json
           
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "chore(qr): regenerate PR-CYBR-BBS QR codes"
+            git commit -m "chore(qr): regenerate PR-CYBR-BBS QR codes [skip ci]"
             git push
           fi

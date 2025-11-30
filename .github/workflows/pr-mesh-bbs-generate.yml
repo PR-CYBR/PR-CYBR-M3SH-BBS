@@ -9,7 +9,8 @@ on:
     - cron: '0 22 * * *'
 
 permissions:
-  contents: read
+  contents: write
+  actions: read
 
 jobs:
   generate:
@@ -46,3 +47,17 @@ jobs:
           path: out/pr-mesh-bbs/
           retention-days: 7
           if-no-files-found: error
+      
+      - name: Export dashboard state
+        run: |
+          python scripts/export_dashboard_state.py --workflow-type mesh --verbose
+      
+      - name: Commit updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet; then
+            git add dashboard/state.json out/
+            git commit -m "chore(dashboard): update PR-MESH-BBS state [skip ci]" || echo "Nothing to commit"
+            git push
+          fi
