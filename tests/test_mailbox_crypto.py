@@ -5,11 +5,6 @@ Tests encryption/decryption round-trip, key derivation, and error handling.
 """
 
 import pytest
-import sys
-from pathlib import Path
-
-# Add scripts directory to path
-sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
 import mailbox_crypto
 

@@ -10,7 +10,6 @@ Each message body is encrypted with the recipient's passphrase.
 """
 
 import json
-import os
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path

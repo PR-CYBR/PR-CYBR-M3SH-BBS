@@ -12,7 +12,6 @@ Security Notes:
 """
 
 import base64
-import os
 import secrets
 from typing import NamedTuple
 

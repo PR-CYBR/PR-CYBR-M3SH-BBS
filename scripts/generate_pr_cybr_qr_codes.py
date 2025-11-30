@@ -45,7 +45,13 @@ def generate_meshtastic_url(
     """
     Generate a Meshtastic channel URL for QR encoding.
     
-    The URL format follows Meshtastic's channel sharing specification.
+    NOTE: This implementation uses a simplified base64+JSON format instead of
+    the official Meshtastic protobuf encoding. For full compatibility with
+    the Meshtastic mobile app, consider implementing proper protobuf encoding
+    using the meshtastic.channel_pb2 module.
+    
+    The URL format follows Meshtastic's channel sharing URL pattern but with
+    a simplified payload for demonstration purposes.
     
     Args:
         channel_name: Name of the channel.
