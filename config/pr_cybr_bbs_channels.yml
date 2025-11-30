@@ -1,0 +1,83 @@
+# PR-CYBR-BBS Channel Configuration
+# Private Multi-Channel Bulletin Board System (Channels 1-6)
+
+bbs:
+  name: "PR-CYBR-BBS"
+  description: "Puerto Rico CYBR Private Mesh Bulletin Board System"
+
+# Dispatch/check schedule (local time - AST/Atlantic Standard Time, UTC-4)
+schedule:
+  - "09:00"
+  - "12:00"
+  - "18:00"
+
+# Channel definitions
+channels:
+  1:
+    name: "OPS-SITREP"
+    description: "Island/division situational reports"
+    source_path: "data/pr-cybr-bbs/ops-sitrep"
+    output_file: "channel-1.json"
+    # Meshtastic channel settings for QR generation
+    psk: null  # Set via environment: MESH_CH1_PSK
+    modem_preset: "ShortFast"
+
+  2:
+    name: "S2-INTEL"
+    description: "Threats, incidents, BOLOs, Amber Alerts"
+    source_path: "data/pr-cybr-bbs/s2-intel"
+    output_file: "channel-2.json"
+    psk: null  # Set via environment: MESH_CH2_PSK
+    modem_preset: "ShortFast"
+
+  3:
+    name: "S3-PLANS"
+    description: "Planned operations, deployments, FTXs"
+    source_path: "data/pr-cybr-bbs/s3-plans"
+    output_file: "channel-3.json"
+    psk: null  # Set via environment: MESH_CH3_PSK
+    modem_preset: "MediumSlow"
+
+  4:
+    name: "M3SH-OPS"
+    description: "PR-CYBR-MAP updates, node status, sensor status"
+    source_path: "data/pr-cybr-bbs/m3sh-ops"
+    output_file: "channel-4.json"
+    psk: null  # Set via environment: MESH_CH4_PSK
+    modem_preset: "ShortFast"
+    # Additional status data source
+    status_file: "data/status/nodes.json"
+
+  5:
+    name: "LOG-RES"
+    description: "Logistics and resources"
+    source_path: "data/pr-cybr-bbs/log-res"
+    output_file: "channel-5.json"
+    psk: null  # Set via environment: MESH_CH5_PSK
+    modem_preset: "MediumSlow"
+
+  6:
+    name: "MAILB0X"
+    description: "Encrypted user messaging (Reticulum bridge)"
+    source_path: "data/pr-cybr-bbs/mailbox"
+    output_file: "channel-6.json"
+    psk: null  # Set via environment: MESH_CH6_PSK
+    modem_preset: "ShortFast"
+    # Mailbox-specific settings
+    mailbox_dir: "data/mailboxes"
+    encryption:
+      cipher: "aes-256-gcm"
+      kdf: "argon2id"
+
+# Output settings
+output:
+  directory: "out/pr-cybr-bbs"
+
+# QR code settings for channel join URLs
+qr:
+  output_directory: "assets/qr/pr-cybr-bbs"
+  format: "png"
+  # QR code box size in pixels
+  box_size: 10
+  # Border size in modules
+  border: 4

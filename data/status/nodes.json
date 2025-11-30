@@ -1,0 +1,61 @@
+{
+  "generated_at": "2024-01-15T13:00:00Z",
+  "nodes": [
+    {
+      "node_id": "!a1b2c3d4",
+      "name": "SJU-GW-001",
+      "last_seen": "2024-01-15T12:58:30Z",
+      "battery": 0.92,
+      "rssi": -85,
+      "snr": 9.5,
+      "location": {
+        "lat": 18.4655,
+        "lon": -66.1057,
+        "alt": 15
+      },
+      "tags": ["gateway", "solar", "primary"]
+    },
+    {
+      "node_id": "!e5f6g7h8",
+      "name": "PCE-ND-001",
+      "last_seen": "2024-01-15T12:55:00Z",
+      "battery": 0.78,
+      "rssi": -92,
+      "snr": 7.2,
+      "location": {
+        "lat": 18.0108,
+        "lon": -66.6141,
+        "alt": 25
+      },
+      "tags": ["relay", "fixed"]
+    },
+    {
+      "node_id": "!i9j0k1l2",
+      "name": "MAY-ND-002",
+      "last_seen": "2024-01-15T12:50:15Z",
+      "battery": 0.65,
+      "rssi": -98,
+      "snr": 5.8,
+      "location": {
+        "lat": 18.2011,
+        "lon": -67.1397,
+        "alt": 35
+      },
+      "tags": ["relay", "mobile"]
+    },
+    {
+      "node_id": "!m3n4o5p6",
+      "name": "FAJ-SN-001",
+      "last_seen": "2024-01-15T12:45:00Z",
+      "battery": 0.88,
+      "rssi": -88,
+      "snr": 8.1,
+      "location": {
+        "lat": 18.3358,
+        "lon": -65.6527,
+        "alt": 10
+      },
+      "tags": ["sensor", "weather", "fixed"]
+    }
+  ]
+}
