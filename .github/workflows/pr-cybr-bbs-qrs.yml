@@ -3,6 +3,9 @@ name: PR-CYBR-BBS QR Codes
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   generate-qr:
     name: Generate PR-CYBR-BBS QR Codes

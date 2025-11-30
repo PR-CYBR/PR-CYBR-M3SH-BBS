@@ -8,6 +8,9 @@ on:
     # 18:00 AST (UTC-4) = 22:00 UTC
     - cron: '0 22 * * *'
 
+permissions:
+  contents: read
+
 jobs:
   generate:
     name: Generate PR-MESH-BBS Bulletins

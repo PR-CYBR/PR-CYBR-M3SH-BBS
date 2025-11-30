@@ -16,6 +16,9 @@ on:
       - pr-mesh-bbs
       - pr-cybr-bbs
 
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Test and Validate
