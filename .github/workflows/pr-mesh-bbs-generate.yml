@@ -72,5 +72,5 @@ jobs:
             exit 0
           fi
 
-          git commit -m "chore(bbs): update dashboard state [skip ci]"
+          git commit -m "chore(dashboard): update PR-MESH-BBS state [skip ci]"
           git push
