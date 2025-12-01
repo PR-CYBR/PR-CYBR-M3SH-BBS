@@ -53,11 +53,24 @@ jobs:
           python scripts/export_dashboard_state.py --workflow-type mesh --verbose
       
       - name: Commit updates
+        if: github.ref == 'refs/heads/main'
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if ! git diff --quiet; then
-            git add dashboard/state.json out/
-            git commit -m "chore(dashboard): update PR-MESH-BBS state [skip ci]" || echo "Nothing to commit"
-            git push
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Only stage specific tracked files; do NOT touch the ignored out/ directory
+          if [ -f dashboard/state.json ]; then
+            git add dashboard/state.json
           fi
+          if [ -f data/qr_manifest.json ]; then
+            git add data/qr_manifest.json
+          fi
+
+          # If nothing is staged, exit successfully without committing
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "chore(dashboard): update PR-MESH-BBS state [skip ci]"
+          git push
